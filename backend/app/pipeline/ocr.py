@@ -1,14 +1,18 @@
+import threading
 import numpy as np
 import cv2
 from typing import Optional
 
 _paddle_ocr = None
+_ocr_lock = threading.Lock()
 
 def _get_ocr():
     global _paddle_ocr
     if _paddle_ocr is None:
-        from paddleocr import PaddleOCR
-        _paddle_ocr = PaddleOCR(use_angle_cls=True, lang="en", show_log=False)
+        with _ocr_lock:
+            if _paddle_ocr is None:  # double-checked locking
+                from paddleocr import PaddleOCR
+                _paddle_ocr = PaddleOCR(use_angle_cls=True, lang="en", show_log=False)
     return _paddle_ocr
 
 def crop_title_region(img: np.ndarray) -> np.ndarray:
@@ -25,12 +29,13 @@ def crop_title_region(img: np.ndarray) -> np.ndarray:
 def _preprocess(img: np.ndarray) -> np.ndarray:
     """Enhance contrast for OCR accuracy."""
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4, 4))
-    enhanced = clahe.apply(gray)
-    h, w = enhanced.shape[:2]
+    # Upscale small images before CLAHE for better contrast enhancement
+    h, w = gray.shape[:2]
     if h < 40:
         scale = 40 / h
-        enhanced = cv2.resize(enhanced, (int(w * scale), 40), interpolation=cv2.INTER_CUBIC)
+        gray = cv2.resize(gray, (int(w * scale), 40), interpolation=cv2.INTER_CUBIC)
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(4, 4))
+    enhanced = clahe.apply(gray)
     return cv2.cvtColor(enhanced, cv2.COLOR_GRAY2BGR)
 
 def _run_paddleocr(img: np.ndarray) -> str:
@@ -39,7 +44,7 @@ def _run_paddleocr(img: np.ndarray) -> str:
     result = ocr.ocr(img, cls=True)
     if not result or not result[0]:
         return ""
-    texts = [line[1][0] for line in result[0] if line and line[1]]
+    texts = [line[1][0] for line in result[0] if line and line[1] and len(line[1]) > 0]
     return " ".join(texts)
 
 def extract_title(card_img: np.ndarray) -> Optional[str]:
@@ -49,6 +54,8 @@ def extract_title(card_img: np.ndarray) -> Optional[str]:
     Returns cleaned title string, or None if nothing found.
     """
     region = crop_title_region(card_img)
+    if region.size == 0:
+        return None
     processed = _preprocess(region)
     raw = _run_paddleocr(processed)
     cleaned = raw.strip()
