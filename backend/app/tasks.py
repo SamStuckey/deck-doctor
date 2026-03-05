@@ -1,8 +1,10 @@
 import asyncio
 import json
+import os
 import uuid
 import cv2
 import numpy as np
+import redis as _redis
 from pathlib import Path
 
 from app.celery_app import celery_app
@@ -12,11 +14,12 @@ from app.pipeline.detect import detect_cards
 from app.pipeline.ocr import extract_title
 from app.pipeline.scryfall import lookup_card
 
+def _get_redis_client() -> _redis.Redis:
+    return _redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+
 def _publish_event(job_id: str, card: Card):
     """Publish a card result event to Redis for SSE streaming."""
-    import redis
-    import os
-    r = redis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379/0"))
+    r = _get_redis_client()
     event_data = json.dumps({
         "card_id": card.id,
         "name": card.name,
@@ -40,6 +43,10 @@ def _process_image_sync(image_path: str, job_id: str) -> list[Card]:
             title = extract_title(region.crop)
 
             if title:
+                # asyncio.run() is safe here because Celery uses prefork workers
+                # (fully synchronous, no existing event loop in the thread).
+                # If the worker pool is changed to gevent/eventlet, replace this
+                # with a persistent event loop or a sync Scryfall client.
                 scryfall = asyncio.run(lookup_card(title))
             else:
                 scryfall = None
