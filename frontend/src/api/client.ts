@@ -6,13 +6,13 @@ export async function uploadImages(files: File[]): Promise<UploadResponse> {
   const form = new FormData();
   files.forEach((f) => form.append("files", f));
   const res = await fetch(`${BASE}/api/upload`, { method: "POST", body: form });
-  if (!res.ok) throw new Error("Upload failed");
+  if (!res.ok) throw new Error(`Upload failed (${res.status})`);
   return res.json();
 }
 
 export async function fetchCards(): Promise<Card[]> {
   const res = await fetch(`${BASE}/api/cards`);
-  if (!res.ok) throw new Error("Failed to fetch cards");
+  if (!res.ok) throw new Error(`Failed to fetch cards (${res.status})`);
   return res.json();
 }
 
@@ -22,7 +22,7 @@ export async function fixCard(cardId: string, name: string): Promise<Card> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name }),
   });
-  if (!res.ok) throw new Error("Fix failed");
+  if (!res.ok) throw new Error(`Fix failed (${res.status})`);
   return res.json();
 }
 

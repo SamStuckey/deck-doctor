@@ -9,9 +9,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100">
-      <nav className="border-b border-gray-800 px-6 py-4 flex items-center gap-8">
+      <nav role="tablist" className="border-b border-gray-800 px-6 py-4 flex items-center gap-8">
         <span className="font-bold text-xl text-amber-400">Deck Doctor</span>
         <button
+          role="tab"
+          aria-selected={tab === "upload"}
           onClick={() => setTab("upload")}
           className={`text-sm font-medium pb-1 border-b-2 transition-colors ${
             tab === "upload"
@@ -22,6 +24,8 @@ export default function App() {
           Upload
         </button>
         <button
+          role="tab"
+          aria-selected={tab === "library"}
           onClick={() => setTab("library")}
           className={`text-sm font-medium pb-1 border-b-2 transition-colors ${
             tab === "library"
