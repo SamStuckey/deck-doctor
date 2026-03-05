@@ -5,3 +5,9 @@ backend/.pytest_cache/
 frontend/node_modules/
 frontend/dist/
 .env
+**/__pycache__/
+*.pyc
+*.egg-info/
+.DS_Store
+backend/celerybeat-schedule
+backend/celerybeat.pid
