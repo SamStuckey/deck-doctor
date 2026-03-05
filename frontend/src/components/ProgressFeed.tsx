@@ -14,8 +14,8 @@ export default function ProgressFeed({ events, done }: Props) {
         Processing
       </h3>
       <ul className="space-y-1">
-        {events.map((e, i) => (
-          <li key={i} className="flex items-center gap-2 text-sm">
+        {events.map((e) => (
+          <li key={e.card_id} className="flex items-center gap-2 text-sm">
             {e.status === "identified" ? (
               <span className="text-green-400" aria-hidden="true">✓</span>
             ) : (

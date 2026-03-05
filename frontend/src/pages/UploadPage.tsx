@@ -14,6 +14,12 @@ export default function UploadPage({ onDone }: Props) {
   const [error, setError] = useState<string | null>(null);
   const { events, done } = useSSE(jobId);
 
+  function handleReset() {
+    setJobId(null);
+    setError(null);
+    setUploading(false);
+  }
+
   async function handleFiles(files: File[]) {
     setError(null);
     setUploading(true);
@@ -34,12 +40,20 @@ export default function UploadPage({ onDone }: Props) {
       {error && <p className="text-red-400 text-sm mt-3" role="alert">{error}</p>}
       <ProgressFeed events={events} done={done} />
       {done && (
-        <button
-          onClick={onDone}
-          className="mt-6 px-6 py-2 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-lg transition-colors"
-        >
-          View Library →
-        </button>
+        <div className="mt-6 flex gap-3">
+          <button
+            onClick={onDone}
+            className="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-lg transition-colors"
+          >
+            View Library →
+          </button>
+          <button
+            onClick={handleReset}
+            className="px-6 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold rounded-lg transition-colors"
+          >
+            Scan More Cards
+          </button>
+        </div>
       )}
     </div>
   );
