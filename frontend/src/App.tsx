@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import UploadPage from "./pages/UploadPage";
+import LibraryPage from "./pages/LibraryPage";
 
-function App() {
-  const [count, setCount] = useState(0)
+type Tab = "upload" | "library";
+
+export default function App() {
+  const [tab, setTab] = useState<Tab>("upload");
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="min-h-screen bg-gray-950 text-gray-100">
+      <nav className="border-b border-gray-800 px-6 py-4 flex items-center gap-8">
+        <span className="font-bold text-xl text-amber-400">Deck Doctor</span>
+        <button
+          onClick={() => setTab("upload")}
+          className={`text-sm font-medium pb-1 border-b-2 transition-colors ${
+            tab === "upload"
+              ? "border-amber-400 text-amber-400"
+              : "border-transparent text-gray-400 hover:text-gray-200"
+          }`}
+        >
+          Upload
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+        <button
+          onClick={() => setTab("library")}
+          className={`text-sm font-medium pb-1 border-b-2 transition-colors ${
+            tab === "library"
+              ? "border-amber-400 text-amber-400"
+              : "border-transparent text-gray-400 hover:text-gray-200"
+          }`}
+        >
+          Library
+        </button>
+      </nav>
+      <main className="p-6">
+        {tab === "upload" ? (
+          <UploadPage onDone={() => setTab("library")} />
+        ) : (
+          <LibraryPage />
+        )}
+      </main>
+    </div>
+  );
 }
-
-export default App
