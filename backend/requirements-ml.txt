@@ -1,0 +1,4 @@
+paddlepaddle==2.6.2
+paddleocr==2.7.3
+ultralytics==8.2.48
+opencv-python-headless==4.10.0.84
