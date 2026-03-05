@@ -3,6 +3,15 @@ import Fuse from "fuse.js";
 import { fetchCards } from "../api/client";
 import type { Card } from "../types";
 
+function parseColors(colorsJson: string | null): string[] {
+  if (!colorsJson) return [];
+  try {
+    return JSON.parse(colorsJson);
+  } catch {
+    return [];
+  }
+}
+
 export function useLibrary() {
   const [allCards, setAllCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,17 +39,17 @@ export function useLibrary() {
     if (colorFilter) {
       if (colorFilter === "Colorless") {
         result = result.filter((c) => {
-          const colors: string[] = c.colors ? JSON.parse(c.colors) : [];
+          const colors = parseColors(c.colors);
           return colors.length === 0;
         });
       } else if (colorFilter === "Multicolor") {
         result = result.filter((c) => {
-          const colors: string[] = c.colors ? JSON.parse(c.colors) : [];
+          const colors = parseColors(c.colors);
           return colors.length > 1;
         });
       } else {
         result = result.filter((c) => {
-          const colors: string[] = c.colors ? JSON.parse(c.colors) : [];
+          const colors = parseColors(c.colors);
           return colors.includes(colorFilter) && colors.length === 1;
         });
       }
