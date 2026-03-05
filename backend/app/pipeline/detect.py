@@ -32,7 +32,9 @@ def _opencv_detect(img: np.ndarray) -> list[CardRegion]:
             y1 = max(0, y - pad)
             x2 = min(iw, x + w + pad)
             y2 = min(ih, y + h + pad)
-            regions.append(CardRegion(crop=img[y1:y2, x1:x2], bbox=(x1, y1, x2, y2)))
+            crop = img[y1:y2, x1:x2]
+            if crop.size > 0:
+                regions.append(CardRegion(crop=crop, bbox=(x1, y1, x2, y2)))
 
     return regions
 
@@ -51,15 +53,17 @@ def detect_cards(
     if use_yolo:
         try:
             from ultralytics import YOLO
-            model = YOLO("yolov8n.pt")  # downloaded on first run (~6MB)
+            model = YOLO("yolov8n.pt")
+        except (ImportError, OSError):
+            model = None
+
+        if model is not None:
             results = model(img, verbose=False)
             for box in results[0].boxes:
                 x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
                 crop = img[y1:y2, x1:x2]
                 if crop.size > 0:
                     regions.append(CardRegion(crop=crop, bbox=(x1, y1, x2, y2)))
-        except Exception:
-            regions = []
 
     if not regions:
         regions = _opencv_detect(img)
