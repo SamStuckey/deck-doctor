@@ -10,6 +10,12 @@ export default defineConfig({
       "/api": {
         target: "http://backend:8000",
         changeOrigin: true,
+        // Required for SSE: disable response buffering
+        configure: (proxy) => {
+          proxy.on("proxyRes", (proxyRes) => {
+            proxyRes.headers["x-accel-buffering"] = "no";
+          });
+        },
       },
     },
   },

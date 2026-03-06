@@ -1,6 +1,7 @@
 import type { Card, UploadResponse } from "../types";
 
-const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:8000";
+// For REST calls: use VITE_API_URL if set (production), otherwise relative (dev proxy)
+const BASE = import.meta.env.VITE_API_URL ?? "";
 
 export async function uploadImages(files: File[]): Promise<UploadResponse> {
   const form = new FormData();
@@ -27,5 +28,7 @@ export async function fixCard(cardId: string, name: string): Promise<Card> {
 }
 
 export function createSSEConnection(jobId: string): EventSource {
-  return new EventSource(`${BASE}/api/events/${jobId}`);
+  // Always use relative URL for SSE so it routes through the Vite proxy
+  // (EventSource doesn't support CORS well with absolute cross-origin URLs)
+  return new EventSource(`/api/events/${jobId}`);
 }
