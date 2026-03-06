@@ -12,7 +12,7 @@ interface Props {
 
 export default function CardTile({ card, onFix, onDelete, eager }: Props) {
   return (
-    <div className="group relative rounded-lg overflow-hidden bg-gray-900 border border-gray-800 hover:border-amber-500/50 transition-colors">
+    <div className="group relative rounded-lg overflow-hidden bg-gray-900 border border-gray-800 hover:border-amber-500/50 hover:scale-105 transition-all duration-150 cursor-pointer">
       <img
         src={card.image_url ?? PLACEHOLDER}
         alt={card.name ?? "Unidentified card"}
