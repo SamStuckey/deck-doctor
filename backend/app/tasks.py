@@ -28,14 +28,15 @@ def _publish_event(job_id: str, card: Card):
     })
     r.publish(f"job:{job_id}", event_data)
 
-def _process_image_sync(image_path: str, job_id: str) -> list[Card]:
+def _process_image_sync(image_path: str, job_id: str) -> dict:
     img = cv2.imread(image_path)
     if img is None:
-        return []
+        return {"identified": 0, "unidentified": 0}
 
     regions = detect_cards(img)
     db = SessionLocal()
-    created_cards = []
+    identified = 0
+    unidentified = 0
 
     try:
         for region in regions:
@@ -75,14 +76,18 @@ def _process_image_sync(image_path: str, job_id: str) -> list[Card]:
             db.add(card)
             db.commit()
             db.refresh(card)
-            created_cards.append(card)
+
+            if card.status == CardStatus.identified:
+                identified += 1
+            else:
+                unidentified += 1
 
             _publish_event(job_id, card)
 
     finally:
         db.close()
 
-    return created_cards
+    return {"identified": identified, "unidentified": unidentified}
 
 @celery_app.task(name="process_image")
 def process_image(image_path: str, job_id: str):
