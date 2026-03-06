@@ -13,6 +13,14 @@ router = APIRouter()
 def get_cards(db: Session = Depends(get_db)):
     return db.query(Card).order_by(Card.created_at.desc()).all()
 
+@router.delete("/cards/{card_id}", status_code=204)
+def delete_card(card_id: str, db: Session = Depends(get_db)):
+    card = db.get(Card, card_id)
+    if not card:
+        raise HTTPException(404, "Card not found")
+    db.delete(card)
+    db.commit()
+
 @router.patch("/cards/{card_id}/fix", response_model=CardOut)
 def fix_card(card_id: str, body: CardFixRequest, db: Session = Depends(get_db)):
     card = db.get(Card, card_id)

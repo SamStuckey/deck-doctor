@@ -27,6 +27,11 @@ export async function fixCard(cardId: string, name: string): Promise<Card> {
   return res.json();
 }
 
+export async function deleteCard(cardId: string): Promise<void> {
+  const res = await fetch(`${BASE}/api/cards/${cardId}`, { method: "DELETE" });
+  if (!res.ok) throw new Error(`Delete failed (${res.status})`);
+}
+
 export function createSSEConnection(jobId: string): EventSource {
   // Always use relative URL for SSE so it routes through the Vite proxy
   // (EventSource doesn't support CORS well with absolute cross-origin URLs)

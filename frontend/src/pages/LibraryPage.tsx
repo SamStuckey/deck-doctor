@@ -6,6 +6,7 @@ import TypeFilter from "../components/TypeFilter";
 import LibraryTileView from "../components/LibraryTileView";
 import LibraryGridView from "../components/LibraryGridView";
 import FixCardModal from "../components/FixCardModal";
+import { deleteCard } from "../api/client";
 import type { Card } from "../types";
 
 type View = "tile" | "grid";
@@ -21,12 +22,24 @@ export default function LibraryPage() {
   const [view, setView] = useState<View>("tile");
   const [fixingCard, setFixingCard] = useState<Card | null>(null);
   const [overrides, setOverrides] = useState<Record<string, Card>>({});
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
 
-  const displayCards = cards.map((c) => overrides[c.id] ?? c);
+  const displayCards = cards
+    .filter((c) => !deletedIds.has(c.id))
+    .map((c) => overrides[c.id] ?? c);
 
   function handleFixed(updated: Card) {
     setOverrides((prev) => ({ ...prev, [updated.id]: updated }));
     setFixingCard(null);
+  }
+
+  async function handleDelete(card: Card) {
+    try {
+      await deleteCard(card.id);
+      setDeletedIds((prev) => new Set(prev).add(card.id));
+    } catch {
+      // silently ignore — card stays visible if delete fails
+    }
   }
 
   if (loading) {
@@ -75,7 +88,7 @@ export default function LibraryPage() {
       </div>
 
       {view === "tile" ? (
-        <LibraryTileView cards={displayCards} onFix={setFixingCard} />
+        <LibraryTileView cards={displayCards} onFix={setFixingCard} onDelete={handleDelete} />
       ) : (
         <LibraryGridView cards={displayCards} onFix={setFixingCard} />
       )}
