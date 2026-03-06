@@ -37,12 +37,15 @@ services:
         condition: service_healthy
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
     ports:
       - "5173:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    depends_on:
+      - backend
     environment:
       - VITE_API_URL=http://localhost:8000
 
