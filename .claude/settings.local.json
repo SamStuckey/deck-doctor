@@ -4,7 +4,13 @@
       "Bash(git:*)",
       "WebSearch",
       "Bash(npm install:*)",
-      "Bash(npx tailwindcss:*)"
+      "Bash(npx tailwindcss:*)",
+      "Bash(pip install:*)",
+      "Bash(PYTHONPATH=. python:*)",
+      "Bash(docker compose:*)",
+      "Bash(wait:*)",
+      "Bash(docker ps:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
