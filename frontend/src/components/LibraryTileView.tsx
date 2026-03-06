@@ -12,8 +12,8 @@ export default function LibraryTileView({ cards, onFix }: Props) {
   }
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-      {cards.map((card) => (
-        <CardTile key={card.id} card={card} onFix={onFix} />
+      {cards.map((card, index) => (
+        <CardTile key={card.id} card={card} onFix={onFix} eager={index < 8} />
       ))}
     </div>
   );

@@ -6,16 +6,17 @@ const PLACEHOLDER =
 interface Props {
   card: Card;
   onFix?: (card: Card) => void;
+  eager?: boolean;
 }
 
-export default function CardTile({ card, onFix }: Props) {
+export default function CardTile({ card, onFix, eager }: Props) {
   return (
     <div className="group relative rounded-lg overflow-hidden bg-gray-900 border border-gray-800 hover:border-amber-500/50 transition-colors">
       <img
         src={card.image_url ?? PLACEHOLDER}
         alt={card.name ?? "Unidentified card"}
         className="w-full object-cover"
-        loading="lazy"
+        loading={eager ? "eager" : "lazy"}
       />
       {card.status === "unidentified" && onFix && (
         <div className="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">

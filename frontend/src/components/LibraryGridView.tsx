@@ -24,11 +24,11 @@ export default function LibraryGridView({ cards, onFix }: Props) {
       <table className="w-full text-sm text-left">
         <thead>
           <tr className="border-b border-gray-800 text-gray-500 uppercase text-xs">
-            <th className="py-2 pr-4">Name</th>
-            <th className="py-2 pr-4">Type</th>
-            <th className="py-2 pr-4">Color</th>
-            <th className="py-2 pr-4">Mana Cost</th>
-            <th className="py-2"></th>
+            <th scope="col" className="py-2 pr-4">Name</th>
+            <th scope="col" className="py-2 pr-4">Type</th>
+            <th scope="col" className="py-2 pr-4">Color</th>
+            <th scope="col" className="py-2 pr-4">Mana Cost</th>
+            <th scope="col" className="py-2"></th>
           </tr>
         </thead>
         <tbody>

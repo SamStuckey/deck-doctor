@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Card } from "../types";
 import { fixCard } from "../api/client";
 
@@ -12,6 +12,14 @@ export default function FixCardModal({ card, onClose, onFixed }: Props) {
   const [name, setName] = useState(card.name ?? "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,8 +42,12 @@ export default function FixCardModal({ card, onClose, onFixed }: Props) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="fix-modal-title"
+      onClick={onClose}
     >
-      <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm">
+      <div
+        className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 id="fix-modal-title" className="text-lg font-bold mb-4">Fix Card Name</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
